@@ -1,64 +1,64 @@
-import json
-def load_tasks():
-    try:
-        with open('tasks.json', 'r') as file:
-            return json.load(file)
-    except FileNotFoundError:
-        return []
-def save_tasks(tasks):
-    with open('tasks.json', 'w') as file:
-        json.dump(tasks, file)
-def add_task(tasks):
-    task_name = input("Enter task name: ")
-    due_date = input("Enter due date: ")
-    priority = input("Enter priority (low, medium, high): ")
-
-    tasks.append({
-        "name": task_name,
-        "due_date": due_date,
-        "priority": priority,
-        "completed": False
-    })
-    save_tasks(tasks)
-    print("Task added successfully!")
-def view_tasks(tasks):
-    print("\nTasks:")
-    for idx, task in enumerate(tasks):
-        status = "Done" if task["completed"] else "Pending"
-        print(f"{idx + 1}. {task['name']} - Due: {task['due_date']} - Priority: {task['priority']} - Status: {status}")
-    print()
-def mark_completed(tasks):
-    view_tasks(tasks)
-    task_idx = int(input("Enter the index of the task you want to mark as completed: ")) - 1
-    if 0 <= task_idx < len(tasks):
-        tasks[task_idx]["completed"] = True
-        save_tasks(tasks)
-        print("Task marked as completed!")
-    else:
-        print("Invalid task index.")
-def main():
-    tasks = load_tasks()
-
-    while True:
-        print("To-Do List Application")
-        print("1. Add Task")
-        print("2. View Tasks")
-        print("3. Mark Task as Completed")
-        print("4. Exit")
-
-        choice = input("Enter your choice: ")
-
-        if choice == "1":
-            add_task(tasks)
-        elif choice == "2":
-            view_tasks(tasks)
-        elif choice == "3":
-            mark_completed(tasks)
-        elif choice == "4":
-            print("Exiting...")
-            break
-        else:
-            print("Invalid choice. Please select a valid option.")
-
-if __name__ == "__main__":
-    main()
+from tkinter import *
+from tkinter import messagebox
+tasks_list = []
+counter = 1
+def inputError() :
+    if enterTaskField.get() == "" :
+        messagebox.showerror("Input Error")
+        return 0
+    return 1
+ 
+def clear_taskNumberField() :
+    taskNumberField.delete(0.0, END)   
+def clear_taskField() :
+    enterTaskField.delete(0, END)
+     
+def insertTask():
+    global counter
+    value = inputError()
+    if value == 0 :
+        return
+    content = enterTaskField.get() + "\n"
+    tasks_list.append(content)
+    TextArea.insert('end -1 chars', "[ " + str(counter) + " ] " + content)
+    counter += 1
+    clear_taskField()
+def delete() :
+    global counter
+    if len(tasks_list) == 0 :
+        messagebox.showerror("No task")
+        return
+    number = taskNumberField.get(1.0, END)
+    if number == "\n" :
+        messagebox.showerror("input error")
+        return
+    else :
+        task_no = int(number)
+    clear_taskNumberField()
+    tasks_list.pop(task_no - 1)
+    counter -= 1
+    TextArea.delete(1.0, END)
+    for i in range(len(tasks_list)) :
+        TextArea.insert('end -1 chars', "[ " + str(i + 1) + " ] " + tasks_list[i]) 
+if __name__ == "__main__" :
+    gui = Tk()
+    gui.configure(background = "light green")
+    gui.title("ToDo App")
+    gui.geometry("250x300")
+    enterTask = Label(gui, text = "Enter Your Task", bg = "light green")
+    enterTaskField = Entry(gui)
+    Submit = Button(gui, text = "Submit", fg = "Black", bg = "Red", command = insertTask)
+    TextArea = Text(gui, height = 5, width = 25, font = "lucida 13")
+    taskNumber = Label(gui, text = "Delete Task Number", bg = "blue")
+    taskNumberField = Text(gui, height = 1, width = 2, font = "lucida 13")
+    delete = Button(gui, text = "Delete", fg = "Black", bg = "Red", command = delete)
+    Exit = Button(gui, text = "Exit", fg = "Black", bg = "Red", command = exit)
+    enterTask.grid(row = 0, column = 2)
+    enterTaskField.grid(row = 1, column = 2, ipadx = 50)
+    Submit.grid(row = 2, column = 2)
+    TextArea.grid(row = 3, column = 2, padx = 10, sticky = W)
+    taskNumber.grid(row = 4, column = 2, pady = 5)
+    taskNumberField.grid(row = 5, column = 2)
+    delete.grid(row = 6, column = 2, pady = 5)
+    Exit.grid(row = 7, column = 2)
+    gui.mainloop()
